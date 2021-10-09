@@ -5,6 +5,7 @@ import * as passport from 'passport';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as cookieParser from 'cookie-parser';
 
 declare const module: any;
 
@@ -16,6 +17,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  // app.useGlobalFilters(new HttpExceptionFilter());
 
   if (process.env.NODE_ENV === 'production') {
     app.enableCors({
@@ -28,6 +30,8 @@ async function bootstrap() {
       credentials: true,
     });
   }
+
+  app.use(cookieParser());
 
   app.use(
     session({

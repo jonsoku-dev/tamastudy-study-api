@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../common/schemas/user.schema';
@@ -21,11 +25,13 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const user = await this.userModel.create({
+    const user = new this.userModel({
       username,
       email,
       password: hashedPassword,
     });
+
+    await user.save();
 
     return {
       username: user.username,
@@ -33,9 +39,16 @@ export class UsersService {
     };
   }
 
-  async removeUser(email: string) {
-    console.log(email);
-    await this.userModel.findOneAndDelete({ email });
-    return null;
+  signOut(email: string) {
+    try {
+      return this.userModel.findOneAndUpdate(
+        { email },
+        { islive: true },
+        { new: true },
+      );
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException(err);
+    }
   }
 }

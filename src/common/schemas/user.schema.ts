@@ -2,7 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class User {
   @ApiProperty({
     type: String,
@@ -40,6 +42,19 @@ export class User {
     required: true,
   })
   password: string;
+
+  @ApiProperty({
+    type: Boolean,
+    description: '회원탈퇴여부',
+    example: false,
+    required: true,
+  })
+  @Prop({
+    type: Boolean,
+    required: true,
+    default: false,
+  })
+  islive: boolean;
 }
 
 export type UserDocument = User & Document;

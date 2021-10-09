@@ -50,8 +50,8 @@ export class UsersController {
   @ApiResponse({ status: 400, description: '클라이언트에러' })
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@User() user) {
-    return user;
+  login() {
+    return null;
   }
 
   @ApiCookieAuth('connect.sid')
@@ -88,7 +88,7 @@ export class UsersController {
   @UseGuards(LoggedInGuard)
   @Post('signout')
   async signOut(@User() user: UserResponseDto, @Res() res) {
-    await this.usersService.removeUser(user.email);
+    await this.usersService.signOut(user.email);
     res.clearCookie('connect.sid', { httpOnly: true });
     return res.send('ok');
   }
