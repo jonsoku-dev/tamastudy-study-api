@@ -33,10 +33,7 @@ export class UsersService {
 
     await user.save();
 
-    return {
-      username: user.username,
-      email: user.email,
-    };
+    return user;
   }
 
   signOut(email: string) {

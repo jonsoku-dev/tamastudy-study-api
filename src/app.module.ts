@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
+import { NoticesModule } from './notices/notices.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { LoggerMiddleware } from './common/middlewares/logger.middleware';
     }),
     UsersModule,
     AuthModule,
+    NoticesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
