@@ -1,30 +1,56 @@
-import { Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { NoticesService } from './notices.service';
-import { JoinRequestDto } from '../users/dto/join.request.dto';
 import { UserResponseDto } from '../users/dto/user.response.dto';
 import { NoticeResponseDto } from './dto/notice.response.dto';
+import { User } from '../common/decorators/user.decorator';
+import { CreateNoticeRequestDto } from './dto/create-notice.request.dto';
+import { LoggedInGuard } from '../auth/logged-in.guard';
+import { GetNoticesQueryDto } from './dto/get-notices.query.dto';
+import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
+import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
+import { EditNoticeRequestDto } from './dto/edit-notice-request.dto';
 
 @ApiTags('notices')
 @Controller('api/notices')
 export class NoticesController {
   constructor(private readonly noticesService: NoticesService) {}
   // C
+  @ApiCookieAuth('connect.sid')
   @ApiOperation({ summary: '공지사항 생성' })
-  @ApiBody({ type: JoinRequestDto })
+  @ApiBody({ type: CreateNoticeRequestDto })
   @ApiResponse({
     status: 201,
     description: '공지사항 생성 완료',
-    type: UserResponseDto,
+    type: NoticeResponseDto,
   })
   @ApiResponse({ status: 403, description: '권한 에러' })
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
+  @UseGuards(LoggedInGuard)
   @Post('')
-  createNotice() {
-    return {
-      notice: 'getNotices!',
-    };
+  createNotice(
+    @User() user: UserResponseDto,
+    @Body() dto: CreateNoticeRequestDto,
+  ) {
+    return this.noticesService.create(user._id, dto);
   }
 
   // R
@@ -38,10 +64,8 @@ export class NoticesController {
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
   @Get('')
-  getNotices() {
-    return {
-      notice: 'notice!',
-    };
+  getNotices(@Query() query: GetNoticesQueryDto) {
+    return this.noticesService.getAll(query);
   }
 
   // R
@@ -55,13 +79,12 @@ export class NoticesController {
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
   @Get(':noticeId')
-  getNotice(@Param() noticeId: string) {
-    return {
-      notice: `${noticeId} : getNotice`,
-    };
+  getNotice(@Param('noticeId', ParseObjectIdPipe) noticeId: mongoose.ObjectId) {
+    return this.noticesService.getOne(noticeId);
   }
 
-  // R
+  // U
+  @ApiCookieAuth('connect.sid')
   @ApiOperation({ summary: '공지사항 수정' })
   @ApiResponse({
     status: 200,
@@ -71,14 +94,19 @@ export class NoticesController {
   @ApiResponse({ status: 403, description: '권한 에러' })
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
+  @UseGuards(LoggedInGuard)
   @Put(':noticeId')
-  editNotice(@Param() noticeId: string) {
-    return {
-      notice: `${noticeId} : editNotice`,
-    };
+  editNotice(
+    @User() user: UserResponseDto,
+    @Param('noticeId', ParseObjectIdPipe) noticeId: mongoose.ObjectId,
+    @Body() dto: EditNoticeRequestDto,
+  ) {
+    const userId = user._id;
+    return this.noticesService.edit(userId, noticeId, dto);
   }
 
-  // R
+  // D
+  @ApiCookieAuth('connect.sid')
   @ApiOperation({ summary: '공지사항 수정' })
   @ApiResponse({
     status: 200,
@@ -89,9 +117,11 @@ export class NoticesController {
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
   @Delete(':noticeId')
-  deleteNotice(@Param() noticeId: string) {
-    return {
-      notice: `${noticeId} : deleteNotice`,
-    };
+  deleteNotice(
+    @User() user: UserResponseDto,
+    @Param('noticeId', ParseObjectIdPipe) noticeId: mongoose.ObjectId,
+  ) {
+    const userId = user._id;
+    return this.noticesService.delete(userId, noticeId);
   }
 }

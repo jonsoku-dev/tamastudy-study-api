@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { LoginRequestDto } from './dto/login.request.dto';
 import { UserResponseDto } from './dto/user.response.dto';
+import { NotLoggedInGuard } from '../auth/not-logged-in.guard';
 
 @ApiTags('USERS')
 @Controller('api/users')
@@ -49,6 +50,7 @@ export class UsersController {
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
   @UseGuards(LocalAuthGuard)
+  @UseGuards(NotLoggedInGuard)
   @Post('login')
   login() {
     return null;

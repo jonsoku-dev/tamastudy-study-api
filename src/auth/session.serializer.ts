@@ -10,7 +10,7 @@ export class SessionSerializer extends PassportSerializer {
 
   // user 의 id 만 뽑아서 session 에 저장한다.
   serializeUser(user: any, done: (err: Error, user: any) => void): any {
-    const { _id } = user; // password 가 제외된 상태로 오게됨.
+    const { _id } = user;
     done(null, { _id });
   }
 
@@ -20,14 +20,14 @@ export class SessionSerializer extends PassportSerializer {
     done: (err: Error, payload: any) => void,
   ): Promise<any> {
     try {
-      const user = await this.userModel.findById(payload._id);
+      const user = await this.userModel
+        .findById(payload._id)
+        .select('-password');
       if (!user) {
         return null;
       }
-      done(null, {
-        email: user.email,
-        username: user.username,
-      });
+      console.log(user);
+      done(null, user);
     } catch (err) {
       done(err, null);
     }

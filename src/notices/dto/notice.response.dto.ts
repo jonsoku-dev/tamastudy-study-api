@@ -1,8 +1,7 @@
-import { Notice } from '../../common/schemas/notice.schema';
 import { ApiProperty } from '@nestjs/swagger';
-import mongoose from 'mongoose';
+import * as mongoose from 'mongoose';
 
-export class NoticeResponseDto extends Notice {
+export class NoticeResponseDto {
   @ApiProperty({
     type: String,
     description: '공지사항 아이디',
@@ -42,4 +41,12 @@ export class NoticeResponseDto extends Notice {
     required: false,
   })
   islive: boolean;
+
+  @ApiProperty({
+    type: Boolean,
+    description: '유저 아이디',
+    example: '61613976c18a6acadc5f0949',
+    required: false,
+  })
+  user: mongoose.ObjectId;
 }
