@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import * as mongoose from 'mongoose';
+import { UserResponseDto } from '../../users/dto/user.response.dto';
+import {
+  IsBoolean,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class NoticeResponseDto {
   @ApiProperty({
@@ -8,6 +17,8 @@ export class NoticeResponseDto {
     example: '61613976c18a6acadc5f0949',
     required: false,
   })
+  @IsMongoId()
+  @IsNotEmpty()
   _id: mongoose.ObjectId;
 
   @ApiProperty({
@@ -16,6 +27,7 @@ export class NoticeResponseDto {
     example: '공지사항 타이틀입니다',
     required: false,
   })
+  @IsString()
   title: string;
 
   @ApiProperty({
@@ -24,6 +36,7 @@ export class NoticeResponseDto {
     example: '공지사항 본문입니다.',
     required: false,
   })
+  @IsString()
   content: string;
 
   @ApiProperty({
@@ -32,6 +45,8 @@ export class NoticeResponseDto {
     example: 0,
     required: false,
   })
+  @IsNumber()
+  @IsPositive()
   viewCount: number;
 
   @ApiProperty({
@@ -40,13 +55,14 @@ export class NoticeResponseDto {
     example: false,
     required: false,
   })
+  @IsBoolean()
   islive: boolean;
 
   @ApiProperty({
-    type: Boolean,
-    description: '유저 아이디',
-    example: '61613976c18a6acadc5f0949',
+    type: UserResponseDto,
+    description: '유저 정보',
+    example: '???',
     required: false,
   })
-  user: mongoose.ObjectId;
+  user: UserResponseDto;
 }

@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class EditNoticeRequestDto {
   @ApiProperty({
@@ -7,6 +9,9 @@ export class EditNoticeRequestDto {
     example: '공지사항 타이틀입니다',
     required: false,
   })
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
   title: string;
 
   @ApiProperty({
@@ -15,5 +20,8 @@ export class EditNoticeRequestDto {
     example: '공지사항 본문입니다.',
     required: false,
   })
+  @IsString()
+  @IsOptional()
+  @Type(() => String)
   content: string;
 }

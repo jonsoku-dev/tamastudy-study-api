@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 
+export enum UserRole {
+  Admin = 'Admin',
+  User = 'User',
+}
+
 @Schema({
   timestamps: true,
 })
@@ -30,8 +35,16 @@ export class User {
     type: Boolean,
     required: true,
     default: false,
+    index: true,
   })
   islive: boolean;
+
+  @Prop({
+    enum: [UserRole.User, UserRole.Admin],
+    required: true,
+    default: UserRole.User,
+  })
+  role: UserRole;
 }
 
 export type UserDocument = User & Document;

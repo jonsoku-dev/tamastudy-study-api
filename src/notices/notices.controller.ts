@@ -21,12 +21,12 @@ import { UserResponseDto } from '../users/dto/user.response.dto';
 import { NoticeResponseDto } from './dto/notice.response.dto';
 import { User } from '../common/decorators/user.decorator';
 import { CreateNoticeRequestDto } from './dto/create-notice.request.dto';
-import { LoggedInGuard } from '../auth/logged-in.guard';
 import { GetNoticesQueryDto } from './dto/get-notices.query.dto';
 import { ParseObjectIdPipe } from '../common/pipes/parse-object-id.pipe';
-import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 import { EditNoticeRequestDto } from './dto/edit-notice-request.dto';
+import { AdminGuard } from '../auth/admin.guard';
+import { GetNoticesByCursorQueryDto } from './dto/get-notices-by-cursor.query.dto';
 
 @ApiTags('notices')
 @Controller('api/notices')
@@ -44,7 +44,7 @@ export class NoticesController {
   @ApiResponse({ status: 403, description: '권한 에러' })
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
-  @UseGuards(LoggedInGuard)
+  @UseGuards(AdminGuard)
   @Post('')
   createNotice(
     @User() user: UserResponseDto,
@@ -66,6 +66,21 @@ export class NoticesController {
   @Get('')
   getNotices(@Query() query: GetNoticesQueryDto) {
     return this.noticesService.getAll(query);
+  }
+
+  // R
+  @ApiOperation({ summary: '공지사항 리스트 (by cursor)' })
+  @ApiResponse({
+    status: 200,
+    description: '공지사항 리스트 불러오기',
+    type: [NoticeResponseDto],
+  })
+  @ApiResponse({ status: 403, description: '권한 에러' })
+  @ApiResponse({ status: 500, description: '서버에러' })
+  @ApiResponse({ status: 400, description: '클라이언트에러' })
+  @Get('cursor')
+  getNoticesByCursor(@Query() query: GetNoticesByCursorQueryDto) {
+    return this.noticesService.getAllByCursor(query);
   }
 
   // R
@@ -94,7 +109,7 @@ export class NoticesController {
   @ApiResponse({ status: 403, description: '권한 에러' })
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
-  @UseGuards(LoggedInGuard)
+  @UseGuards(AdminGuard)
   @Put(':noticeId')
   editNotice(
     @User() user: UserResponseDto,
@@ -116,6 +131,7 @@ export class NoticesController {
   @ApiResponse({ status: 403, description: '권한 에러' })
   @ApiResponse({ status: 500, description: '서버에러' })
   @ApiResponse({ status: 400, description: '클라이언트에러' })
+  @UseGuards(AdminGuard)
   @Delete(':noticeId')
   deleteNotice(
     @User() user: UserResponseDto,

@@ -29,6 +29,7 @@ export class UsersService {
       username,
       email,
       password: hashedPassword,
+      islive: true,
     });
 
     await user.save();
